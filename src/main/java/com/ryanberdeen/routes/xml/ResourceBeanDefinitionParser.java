@@ -56,11 +56,11 @@ public class ResourceBeanDefinitionParser extends AbstractRouteListParser {
 				
 				if (child.getTagName().equals("collection")) {
 					collectionPattern = prefix.append(routeBuilder.getMetaParameter("collectionPattern", ":action"));
-					collectionActions = parseApplys(parserContext, child, collectionPattern, routeBuilder);
+					collectionActions = parseApplyTags(parserContext, child, collectionPattern, routeBuilder);
 				}
 				else if (child.getTagName().equals("member")) {
 					memberPattern = prefix.append(':' + idParameterName + "/:" + actionParamterName);
-					memberActions = parseApplys(parserContext, child, memberPattern, routeBuilder);
+					memberActions = parseApplyTags(parserContext, child, memberPattern, routeBuilder);
 				}
 			}
 		}
@@ -105,7 +105,7 @@ public class ResourceBeanDefinitionParser extends AbstractRouteListParser {
 		}
 	}
 
-	private static ArrayList<BeanDefinition> parseApplys(ParserContext parserContext, Element element, UrlPattern pattern, RouteBuilder baseParameters) {
+	private static ArrayList<BeanDefinition> parseApplyTags(ParserContext parserContext, Element element, UrlPattern pattern, RouteBuilder baseParameters) {
 		ArrayList<BeanDefinition> result = new ArrayList<BeanDefinition>();
 		NodeList children = element.getChildNodes();
 		for (int i = 0; i < children.getLength(); i++) {
