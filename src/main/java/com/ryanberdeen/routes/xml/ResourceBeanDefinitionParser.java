@@ -23,8 +23,8 @@ public class ResourceBeanDefinitionParser extends AbstractRouteListParser {
 	private static final String UPDATE_ACTION = "update";
 	private static final String DESTROY_ACTION = "destroy";
 	
-	private static RouteParameters applyParameters(RouteParameters baseParameters, String method, String parameterName, String action) {
-		RouteParameters result = new RouteParameters();
+	private static RouteBuilder applyParameters(RouteBuilder baseParameters, String method, String parameterName, String action) {
+		RouteBuilder result = new RouteBuilder();
 		result.parameterValues.put(parameterName, action);
 		baseParameters.metaParameters.put("methods", method);
 		
@@ -32,16 +32,16 @@ public class ResourceBeanDefinitionParser extends AbstractRouteListParser {
 	}
 	
 	@SuppressWarnings("unchecked")
-	public void parseRouteList(ParserContext parserContext, Element element, ManagedList list, RouteParameters routeParameters) {
-		routeParameters = RouteParserUtils.applyRouteParameters(element, routeParameters);
+	public void parseRouteList(ParserContext parserContext, Element element, ManagedList list, RouteBuilder routeBuilder) {
+		routeBuilder = RouteParserUtils.applyRouteParameters(element, routeBuilder);
 		
 		String actionParamterName = "action";
 		
 		NodeList children = element.getChildNodes();
 		
-		UrlPattern prefix = RouteParserUtils.createUrlPattern(routeParameters);
+		UrlPattern prefix = RouteParserUtils.createUrlPattern(routeBuilder);
 
-		String idParameterName = routeParameters.getMetaParameter("idParameter", "id");
+		String idParameterName = routeBuilder.getMetaParameter("idParameter", "id");
 		
 		UrlPattern collectionPattern = null;
 		UrlPattern memberPattern = null;
@@ -55,25 +55,25 @@ public class ResourceBeanDefinitionParser extends AbstractRouteListParser {
 				Element child =  (Element) node;
 				
 				if (child.getTagName().equals("collection")) {
-					collectionPattern = prefix.append(routeParameters.getMetaParameter("collectionPattern", ":action"));
-					collectionActions = parseApplys(parserContext, child, collectionPattern, routeParameters);
+					collectionPattern = prefix.append(routeBuilder.getMetaParameter("collectionPattern", ":action"));
+					collectionActions = parseApplys(parserContext, child, collectionPattern, routeBuilder);
 				}
 				else if (child.getTagName().equals("member")) {
 					memberPattern = prefix.append(':' + idParameterName + "/:" + actionParamterName);
-					memberActions = parseApplys(parserContext, child, memberPattern, routeParameters);
+					memberActions = parseApplys(parserContext, child, memberPattern, routeBuilder);
 				}
 			}
 		}
 		
 		if (collectionPattern == null) {
-			collectionPattern = prefix.append(routeParameters.getMetaParameter("collectionPattern", ":" + actionParamterName));
+			collectionPattern = prefix.append(routeBuilder.getMetaParameter("collectionPattern", ":" + actionParamterName));
 		}
 		
-		RouteParameters appliedParameters;
+		RouteBuilder appliedParameters;
 
-		RouteParameters collectionParameters = new RouteParameters(routeParameters);
+		RouteBuilder collectionParameters = new RouteBuilder(routeBuilder);
 		collectionParameters.parameterValues.put(actionParamterName, INDEX_ACTION);
-		appliedParameters = applyParameters(routeParameters, GET_METHOD, actionParamterName, INDEX_ACTION);
+		appliedParameters = applyParameters(routeBuilder, GET_METHOD, actionParamterName, INDEX_ACTION);
 		list.add(RouteParserUtils.createAppliedRouteBeanDefinition(element, parserContext, collectionPattern, collectionParameters, appliedParameters));
 		
 		if (collectionActions != null) {
@@ -84,20 +84,20 @@ public class ResourceBeanDefinitionParser extends AbstractRouteListParser {
 			memberPattern = prefix.append(':' + idParameterName + "/:" + actionParamterName);
 		}
 		
-		RouteParameters memberParameters = new RouteParameters(routeParameters);
+		RouteBuilder memberParameters = new RouteBuilder(routeBuilder);
 		memberParameters.parameterValues.put(actionParamterName, SHOW_ACTION);
 		memberParameters.defaultStaticParameterValues.put(actionParamterName, SHOW_ACTION);
 		
-		appliedParameters = applyParameters(routeParameters, GET_METHOD, actionParamterName, SHOW_ACTION);
+		appliedParameters = applyParameters(routeBuilder, GET_METHOD, actionParamterName, SHOW_ACTION);
 		list.add(RouteParserUtils.createAppliedRouteBeanDefinition(element, parserContext, memberPattern, memberParameters, appliedParameters));
 		
-		appliedParameters = applyParameters(routeParameters, POST_METHOD, actionParamterName, CREATE_ACTION);
+		appliedParameters = applyParameters(routeBuilder, POST_METHOD, actionParamterName, CREATE_ACTION);
 		list.add(RouteParserUtils.createAppliedRouteBeanDefinition(element, parserContext, memberPattern, memberParameters, appliedParameters));
 		
-		appliedParameters = applyParameters(routeParameters, PUT_METHOD, actionParamterName, UPDATE_ACTION);
+		appliedParameters = applyParameters(routeBuilder, PUT_METHOD, actionParamterName, UPDATE_ACTION);
 		list.add(RouteParserUtils.createAppliedRouteBeanDefinition(element, parserContext, memberPattern, memberParameters, appliedParameters));
 		
-		appliedParameters = applyParameters(routeParameters, DELETE_METHOD, actionParamterName, DESTROY_ACTION);
+		appliedParameters = applyParameters(routeBuilder, DELETE_METHOD, actionParamterName, DESTROY_ACTION);
 		list.add(RouteParserUtils.createAppliedRouteBeanDefinition(element, parserContext, memberPattern, memberParameters, appliedParameters));
 		
 		if (memberActions != null) {
@@ -105,15 +105,15 @@ public class ResourceBeanDefinitionParser extends AbstractRouteListParser {
 		}
 	}
 
-	private static ArrayList<BeanDefinition> parseApplys(ParserContext parserContext, Element element, UrlPattern pattern, RouteParameters baseParameters) {
+	private static ArrayList<BeanDefinition> parseApplys(ParserContext parserContext, Element element, UrlPattern pattern, RouteBuilder baseParameters) {
 		ArrayList<BeanDefinition> result = new ArrayList<BeanDefinition>();
 		NodeList children = element.getChildNodes();
 		for (int i = 0; i < children.getLength(); i++) {
 			Node node = children.item(i);
 			if (node instanceof Element) {
 				Element child =  (Element) node;
-				RouteParameters applyParameters = new RouteParameters();
-				RouteParameters appliedParameters = RouteParserUtils.applyRouteParameters(child, applyParameters);
+				RouteBuilder applyParameters = new RouteBuilder();
+				RouteBuilder appliedParameters = RouteParserUtils.applyRouteParameters(child, applyParameters);
 				
 				result.add(RouteParserUtils.createAppliedRouteBeanDefinition(element, parserContext, pattern, baseParameters, appliedParameters));
 			}

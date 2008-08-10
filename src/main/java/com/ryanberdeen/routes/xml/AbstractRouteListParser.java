@@ -18,8 +18,8 @@ public abstract class AbstractRouteListParser extends AbstractSingleBeanDefiniti
 	@Override
 	protected void doParse(Element element, ParserContext parserContext, BeanDefinitionBuilder builder) {
 		ManagedList list = new ManagedList();
-		RouteParameters routeParameters = new RouteParameters();
-		parseRouteList(new ParserContext(parserContext.getReaderContext(), parserContext.getDelegate(), builder.getRawBeanDefinition()), element, list, routeParameters);
+		RouteBuilder routeBuilder = new RouteBuilder();
+		parseRouteList(new ParserContext(parserContext.getReaderContext(), parserContext.getDelegate(), builder.getRawBeanDefinition()), element, list, routeBuilder);
 		applyRouteList(parserContext, element, list, builder);
 	}
 	
@@ -28,7 +28,7 @@ public abstract class AbstractRouteListParser extends AbstractSingleBeanDefiniti
 	}
 	
 	@SuppressWarnings("unchecked")
-	public void parseRouteList(ParserContext parserContext, Element element, ManagedList list, RouteParameters routeParameters) {
+	public void parseRouteList(ParserContext parserContext, Element element, ManagedList list, RouteBuilder routeBuilder) {
 		NodeList children = element.getChildNodes();
 		
 		for (int i = 0; i < children.getLength(); i++) {
@@ -38,13 +38,13 @@ public abstract class AbstractRouteListParser extends AbstractSingleBeanDefiniti
 				
 				String name = child.getTagName();
 				if (name.equals("resource")) {
-					new ResourceBeanDefinitionParser().parseRouteList(parserContext, child, list, routeParameters);
+					new ResourceBeanDefinitionParser().parseRouteList(parserContext, child, list, routeBuilder);
 				}
 				else if (name.equals("with")) {
-					new WithBeanDefinitionParser().parseRouteList(parserContext, child, list, routeParameters);
+					new WithBeanDefinitionParser().parseRouteList(parserContext, child, list, routeBuilder);
 				}
 				else if (name.equals("connect")) {
-					list.add(new ConnectBeanDefinitionParser().parse(child, parserContext, routeParameters));
+					list.add(new ConnectBeanDefinitionParser().parse(child, parserContext, routeBuilder));
 				}
 			}
 		}

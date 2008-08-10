@@ -2,17 +2,17 @@ package com.ryanberdeen.routes.xml;
 
 import java.util.HashMap;
 
-class RouteParameters implements Cloneable {
+class RouteBuilder implements Cloneable {
 	public HashMap<String, String> metaParameters;
 	public HashMap<String, String> parameterValues;
 	public HashMap<String, String> defaultStaticParameterValues;
 	public HashMap<String, String> parameterRegexes;
 	
-	public RouteParameters() {
+	public RouteBuilder() {
 		initDefault();
 	}
 	
-	public RouteParameters(RouteParameters that) {
+	public RouteBuilder(RouteBuilder that) {
 		if (that != null) {
 			metaParameters = new HashMap<String, String>(that.metaParameters);
 			parameterValues = new HashMap<String, String>(that.parameterValues);
@@ -41,7 +41,7 @@ class RouteParameters implements Cloneable {
 	}
 	
 	@Override
-	protected RouteParameters clone() throws CloneNotSupportedException {
-		return new RouteParameters(this);
+	protected RouteBuilder clone() throws CloneNotSupportedException {
+		return new RouteBuilder(this);
 	}
 }

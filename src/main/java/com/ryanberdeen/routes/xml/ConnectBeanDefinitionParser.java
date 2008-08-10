@@ -11,10 +11,10 @@ public class ConnectBeanDefinitionParser implements BeanDefinitionParser {
 		return parse(element, parserContext, null);
 	}
 	
-	public BeanDefinition parse(Element element, ParserContext parserContext, RouteParameters routeParameters) {
-		routeParameters = RouteParserUtils.applyRouteParameters(element, routeParameters);
+	public BeanDefinition parse(Element element, ParserContext parserContext, RouteBuilder routeBuilder) {
+		routeBuilder = RouteParserUtils.applyRouteParameters(element, routeBuilder);
 		
-		return RouteParserUtils.createRouteBeanDefinition(element, parserContext, routeParameters);
+		return RouteParserUtils.createRouteBeanDefinition(element, parserContext, routeBuilder);
 	}
 
 }

@@ -6,5 +6,5 @@ import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
 public interface RouteListParser extends BeanDefinitionParser {
-	public void parseRouteList(ParserContext parserContext, Element element, ManagedList list, RouteParameters routeParameters);
+	public void parseRouteList(ParserContext parserContext, Element element, ManagedList list, RouteBuilder routeBuilder);
 }
