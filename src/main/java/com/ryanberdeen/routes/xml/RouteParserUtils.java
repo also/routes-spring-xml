@@ -17,17 +17,13 @@ import com.ryanberdeen.routes.UrlPattern;
 public class RouteParserUtils {
 	
 	public static Route createRoute(RouteBuilder routeBuilder) {
-		Route result = new Route(getPattern(routeBuilder), routeBuilder.parameterValues, routeBuilder.parameterRegexes);
+		Route result = new Route(routeBuilder.getPattern(), routeBuilder.parameterValues, routeBuilder.parameterRegexes);
 		result.setDefaultStaticParameters(routeBuilder.defaultStaticParameterValues);
-		result.setName(getName(routeBuilder));
-		result.setMethods(getMethods(routeBuilder));
-		result.setExcludedMethods(getExcludedMethods(routeBuilder));
+		result.setName(routeBuilder.getName());
+		result.setMethods(routeBuilder.getMethods());
+		result.setExcludedMethods(routeBuilder.getExcludedMethods());
 		
 		return result;
-	}
-	
-	public static UrlPattern createUrlPattern(RouteBuilder routeBuilder) {
-		return UrlPattern.parse(getPattern(routeBuilder), routeBuilder.parameterValues.keySet(), routeBuilder.parameterRegexes);
 	}
 	
 	/** Parses the element, using only parameters from the parameterValues argument.
@@ -36,7 +32,7 @@ public class RouteParserUtils {
 		BeanDefinitionBuilder builder = BeanDefinitionBuilder.genericBeanDefinition(Route.class);
 		builder.getRawBeanDefinition().setSource(parserContext.extractSource(element));
 
-		builder.addConstructorArgValue(getPattern(routeBuilder));
+		builder.addConstructorArgValue(routeBuilder.getPattern());
 		builder.addConstructorArgValue(routeBuilder.parameterValues);
 		builder.addConstructorArgValue(routeBuilder.parameterRegexes);
 		addPropertyValues(builder, routeBuilder);
@@ -75,45 +71,9 @@ public class RouteParserUtils {
 	
 	private static void addPropertyValues(BeanDefinitionBuilder builder, RouteBuilder routeBuilder) {
 		builder.addPropertyValue("defaultStaticParameters", routeBuilder.defaultStaticParameterValues);
-		builder.addPropertyValue("name", getName(routeBuilder));
-		builder.addPropertyValue("methods", getMethods(routeBuilder));
-		builder.addPropertyValue("excludedMethods", getExcludedMethods(routeBuilder));
-	}
-	
-	public static HashSet<String> getMethods(RouteBuilder routeBuilder) {
-		return getMethods(routeBuilder.getMetaParameter("methods"));
-	}
-	
-	public static HashSet<String> getExcludedMethods(RouteBuilder routeBuilder) {
-		return getMethods(routeBuilder.getMetaParameter("excludedMethods"));
-	}
-	
-	private static HashSet<String> getMethods(String value) {
-		if (value == null || value.equals("any")) {
-			return null;
-		}
-		String[] methodsArray = value.split(",");
-		HashSet<String> methods = new HashSet<String>(methodsArray.length);
-		for (String method : methodsArray) {
-			methods.add(method.toUpperCase());
-		}
-		
-		return methods;
-	}
-	
-	private static String getName(RouteBuilder routeBuilder) {
-		String name = routeBuilder.metaParameters.get("name");
-		if (name != null) {
-			name = routeBuilder.getMetaParameter("namePrefix", "") + name;
-		}
-		
-		return name;
-	}
-	
-	private static String getPattern(RouteBuilder routeBuilder) {
-		String patternPrefix = routeBuilder.getMetaParameter("patternPrefix", "");
-		String pattern = routeBuilder.getMetaParameter("pattern");
-		return patternPrefix + pattern;
+		builder.addPropertyValue("name", routeBuilder.getName());
+		builder.addPropertyValue("methods", routeBuilder.getMethods());
+		builder.addPropertyValue("excludedMethods", routeBuilder.getExcludedMethods());
 	}
 	
 	public static RouteBuilder applyRouteParameters(Element element, RouteBuilder routeBuilder) {

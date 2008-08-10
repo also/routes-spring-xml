@@ -1,6 +1,9 @@
 package com.ryanberdeen.routes.xml;
 
 import java.util.HashMap;
+import java.util.HashSet;
+
+import com.ryanberdeen.routes.UrlPattern;
 
 class RouteBuilder implements Cloneable {
 	public HashMap<String, String> metaParameters;
@@ -43,5 +46,47 @@ class RouteBuilder implements Cloneable {
 	@Override
 	protected RouteBuilder clone() throws CloneNotSupportedException {
 		return new RouteBuilder(this);
+	}
+	
+
+	
+	public String getPattern() {
+		String patternPrefix = getMetaParameter("patternPrefix", "");
+		String pattern = getMetaParameter("pattern");
+		return patternPrefix + pattern;
+	}
+
+	public UrlPattern createUrlPattern() {
+		return UrlPattern.parse(getPattern(), parameterValues.keySet(), parameterRegexes);
+	}
+	
+	public HashSet<String> getMethods() {
+		return getMethods(getMetaParameter("methods"));
+	}
+	
+	public HashSet<String> getExcludedMethods() {
+		return getMethods(getMetaParameter("excludedMethods"));
+	}
+	
+	private static HashSet<String> getMethods(String value) {
+		if (value == null || value.equals("any")) {
+			return null;
+		}
+		String[] methodsArray = value.split(",");
+		HashSet<String> methods = new HashSet<String>(methodsArray.length);
+		for (String method : methodsArray) {
+			methods.add(method.toUpperCase());
+		}
+		
+		return methods;
+	}
+	
+	public String getName() {
+		String name = metaParameters.get("name");
+		if (name != null) {
+			name = getMetaParameter("namePrefix", "") + name;
+		}
+		
+		return name;
 	}
 }

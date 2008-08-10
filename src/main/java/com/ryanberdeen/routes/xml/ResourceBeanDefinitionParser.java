@@ -39,7 +39,7 @@ public class ResourceBeanDefinitionParser extends AbstractRouteListParser {
 		
 		NodeList children = element.getChildNodes();
 		
-		UrlPattern prefix = RouteParserUtils.createUrlPattern(routeBuilder);
+		UrlPattern prefix = routeBuilder.createUrlPattern();
 
 		String idParameterName = routeBuilder.getMetaParameter("idParameter", "id");
 		
