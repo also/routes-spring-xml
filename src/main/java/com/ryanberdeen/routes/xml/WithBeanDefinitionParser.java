@@ -6,7 +6,7 @@ import org.w3c.dom.Element;
 
 public class WithBeanDefinitionParser extends AbstractRouteListParser {
 	public void parseRouteList(ParserContext parserContext, Element element, ManagedList list, RouteBuilder routeBuilder) {
-		routeBuilder = RouteParserUtils.applyRouteParameters(element, routeBuilder);
+		routeBuilder = RouteParserUtils.parseRouteParameters(element, routeBuilder);
 		super.parseRouteList(parserContext, element, list, routeBuilder);
 	}
 }

@@ -16,10 +16,10 @@ public class RoutesBeanDefinitionParser extends AbstractRouteListParser {
 			return parserContext.getReaderContext().generateBeanName(definition);
 		}
 	}
-	
+
 	@Override
 	public void parseRouteList(ParserContext parserContext, Element element, ManagedList list, RouteBuilder routeBuilder) {
-		RouteParserUtils.applyRouteParameterTags(element, routeBuilder);
+		RouteParserUtils.parseRouteParameterTags(element, routeBuilder);
 		super.parseRouteList(parserContext, element, list, routeBuilder);
 	}
 }

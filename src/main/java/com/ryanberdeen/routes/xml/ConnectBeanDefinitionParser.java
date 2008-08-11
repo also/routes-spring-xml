@@ -6,14 +6,14 @@ import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
 public class ConnectBeanDefinitionParser implements BeanDefinitionParser {
-	
+
 	public BeanDefinition parse(Element element, ParserContext parserContext) {
 		return parse(element, parserContext, null);
 	}
-	
+
 	public BeanDefinition parse(Element element, ParserContext parserContext, RouteBuilder routeBuilder) {
-		routeBuilder = RouteParserUtils.applyRouteParameters(element, routeBuilder);
-		
+		routeBuilder = RouteParserUtils.parseRouteParameters(element, routeBuilder);
+
 		return RouteParserUtils.createRouteBeanDefinition(element, parserContext, routeBuilder);
 	}
 
