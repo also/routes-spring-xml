@@ -25,16 +25,6 @@ public class RouteParserUtils {
 	private static final String VALUE = "value";
 	private static final String PARAMETER = "parameter";
 
-	public static Route createRoute(RouteBuilder routeBuilder) {
-		Route result = new Route(routeBuilder.getPattern(), routeBuilder.parameterValues, routeBuilder.parameterRegexes);
-		result.setDefaultStaticParameters(routeBuilder.defaultStaticParameterValues);
-		result.setName(routeBuilder.getName());
-		result.setMethods(routeBuilder.getMethods());
-		result.setExcludedMethods(routeBuilder.getExcludedMethods());
-
-		return result;
-	}
-
 	/** Parses the element, using only parameters from the parameterValues argument.
 	 */
 	public static BeanDefinition createRouteBeanDefinition(Element element, ParserContext parserContext, RouteBuilder routeBuilder) {
@@ -94,7 +84,7 @@ public class RouteParserUtils {
 			String value = node.getTextContent();
 			String parameterName = node.getLocalName();
 			if (node.getNamespaceURI() != null) {
-				result.metaParameters.put(parameterName, value);
+				result.setOption(parameterName, value);
 			}
 			else {
 				result.parameterValues.put(parameterName, value);

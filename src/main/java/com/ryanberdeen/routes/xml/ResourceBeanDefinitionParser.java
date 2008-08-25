@@ -1,6 +1,7 @@
 package com.ryanberdeen.routes.xml;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Map;
 
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -13,31 +14,17 @@ import org.w3c.dom.NodeList;
 import com.ryanberdeen.routes.UrlPattern;
 
 public class ResourceBeanDefinitionParser extends AbstractRouteListParser {
-	private static final String GET_METHOD = "GET";
-	private static final String POST_METHOD = "POST";
-	private static final String PUT_METHOD = "PUT";
-	private static final String DELETE_METHOD = "DELETE";
-
-	private static final String INDEX_ACTION = "index";
-	private static final String SHOW_ACTION = "show";
-	private static final String CREATE_ACTION = "create";
-	private static final String UPDATE_ACTION = "update";
-	private static final String DESTROY_ACTION = "destroy";
 
 	@SuppressWarnings("unchecked")
 	public void parseRouteList(ParserContext parserContext, Element element, ManagedList list, RouteBuilder routeBuilder) {
 		routeBuilder = RouteParserUtils.parseRouteParameters(element, routeBuilder);
 
-		String actionParamterName = "action";
-
 		NodeList children = element.getChildNodes();
 
 		UrlPattern prefix = routeBuilder.createUrlPattern();
 
-		String idParameterName = routeBuilder.getMetaParameter("idParameter", "id");
-
-		UrlPattern collectionPattern = null;
-		UrlPattern memberPattern = null;
+		UrlPattern collectionActionPattern = null;
+		UrlPattern memberActionPattern = null;
 
 		ArrayList<BeanDefinition> collectionActions = null;
 		ArrayList<BeanDefinition> memberActions = null;
@@ -48,50 +35,42 @@ public class ResourceBeanDefinitionParser extends AbstractRouteListParser {
 				Element child =  (Element) node;
 
 				if (child.getTagName().equals("collection")) {
-					collectionPattern = prefix.append(routeBuilder.getMetaParameter("collectionPattern", ":action"));
-					collectionActions = parseApplyTags(parserContext, child, collectionPattern, routeBuilder);
+					collectionActionPattern = prefix.append(routeBuilder.getCollectionPattern());
+					collectionActions = parseApplyTags(parserContext, child, collectionActionPattern, routeBuilder);
 				}
 				else if (child.getTagName().equals("member")) {
-					memberPattern = prefix.append(':' + idParameterName + "/:" + actionParamterName);
-					memberActions = parseApplyTags(parserContext, child, memberPattern, routeBuilder);
+					memberActionPattern = prefix.append(routeBuilder.getMemberPattern());
+					memberActions = parseApplyTags(parserContext, child, memberActionPattern, routeBuilder);
 				}
 			}
 		}
 
-		if (collectionPattern == null) {
-			collectionPattern = prefix.append(routeBuilder.getMetaParameter("collectionPattern", ":" + actionParamterName));
+		if (collectionActionPattern == null) {
+			collectionActionPattern = prefix.append(routeBuilder.getCollectionPattern());
 		}
 
 		Map<String, String> appliedParameters;
 
-		RouteBuilder collectionParameters = new RouteBuilder(routeBuilder);
-		collectionParameters.parameterValues.put(actionParamterName, INDEX_ACTION);
-		appliedParameters = routeBuilder.applyParameters(GET_METHOD, actionParamterName, INDEX_ACTION);
-		list.add(RouteParserUtils.createAppliedRouteBeanDefinition(element, parserContext, collectionPattern, collectionParameters, appliedParameters));
+		RouteBuilder collectionBuidler = routeBuilder.createCollectionBuilder();
+		for (String action : collectionBuidler.defaultResourceCollectionActions) {
+			appliedParameters = Collections.singletonMap(collectionBuidler.getActionParamterName(), action);
+			list.add(RouteParserUtils.createAppliedRouteBeanDefinition(element, parserContext, collectionActionPattern, routeBuilder, appliedParameters));
+		}
 
 		if (collectionActions != null) {
 			list.addAll(collectionActions);
 		}
 
-		if (memberPattern == null) {
-			memberPattern = prefix.append(':' + idParameterName + "/:" + actionParamterName);
+		if (memberActionPattern == null) {
+			memberActionPattern = prefix.append(routeBuilder.getMemberPattern());
 		}
 
-		RouteBuilder memberParameters = new RouteBuilder(routeBuilder);
-		memberParameters.parameterValues.put(actionParamterName, SHOW_ACTION);
-		memberParameters.defaultStaticParameterValues.put(actionParamterName, SHOW_ACTION);
+		RouteBuilder memberBuilder = routeBuilder.createMemberBuilder();
 
-		appliedParameters = routeBuilder.applyParameters(GET_METHOD, actionParamterName, SHOW_ACTION);
-		list.add(RouteParserUtils.createAppliedRouteBeanDefinition(element, parserContext, memberPattern, memberParameters, appliedParameters));
-
-		appliedParameters = routeBuilder.applyParameters(POST_METHOD, actionParamterName, CREATE_ACTION);
-		list.add(RouteParserUtils.createAppliedRouteBeanDefinition(element, parserContext, memberPattern, memberParameters, appliedParameters));
-
-		appliedParameters = routeBuilder.applyParameters(PUT_METHOD, actionParamterName, UPDATE_ACTION);
-		list.add(RouteParserUtils.createAppliedRouteBeanDefinition(element, parserContext, memberPattern, memberParameters, appliedParameters));
-
-		appliedParameters = routeBuilder.applyParameters(DELETE_METHOD, actionParamterName, DESTROY_ACTION);
-		list.add(RouteParserUtils.createAppliedRouteBeanDefinition(element, parserContext, memberPattern, memberParameters, appliedParameters));
+		for (String action : memberBuilder.defaultResourceMemberActions) {
+			appliedParameters = Collections.singletonMap(collectionBuidler.getActionParamterName(), action);
+			list.add(RouteParserUtils.createAppliedRouteBeanDefinition(element, parserContext, memberActionPattern, memberBuilder, appliedParameters));
+		}
 
 		if (memberActions != null) {
 			list.addAll(memberActions);
