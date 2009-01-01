@@ -13,6 +13,7 @@ import org.w3c.dom.NodeList;
 
 import com.ryanberdeen.routes.Route;
 import com.ryanberdeen.routes.UrlPattern;
+import com.ryanberdeen.routes.builder.RouteBuilder;
 
 public class RouteParserUtils {
 

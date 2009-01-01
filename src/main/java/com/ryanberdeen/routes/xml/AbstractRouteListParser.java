@@ -9,6 +9,8 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import com.ryanberdeen.routes.builder.RouteBuilder;
+
 public abstract class AbstractRouteListParser extends AbstractSingleBeanDefinitionParser implements RouteListParser {
 	@Override
 	protected Class<?> getBeanClass(Element element) {

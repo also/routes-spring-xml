@@ -6,6 +6,8 @@ import org.springframework.beans.factory.support.ManagedList;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
+import com.ryanberdeen.routes.builder.RouteBuilder;
+
 public class RoutesBeanDefinitionParser extends AbstractRouteListParser {
 	@Override
 	protected String resolveId(Element element, AbstractBeanDefinition definition, ParserContext parserContext) throws BeanDefinitionStoreException {

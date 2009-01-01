@@ -12,6 +12,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import com.ryanberdeen.routes.UrlPattern;
+import com.ryanberdeen.routes.builder.RouteBuilder;
 
 public class ResourceBeanDefinitionParser extends AbstractRouteListParser {
 
