@@ -54,7 +54,7 @@ public class ResourceBeanDefinitionParser extends AbstractRouteListParser {
 		RouteBuilder collectionBuilder = routeBuilder.createCollectionBuilder();
 		for (String action : collectionBuilder.defaultResourceCollectionActions) {
 			appliedParameters = Collections.singletonMap(collectionBuilder.getActionParamterName(), action);
-			routes.add(RouteParserUtils.createAppliedRoute(element, parserContext, collectionActionPattern, routeBuilder, appliedParameters));
+			routes.add(routeBuilder.createAppliedRoute(collectionActionPattern, appliedParameters));
 		}
 
 		if (collectionActions != null) {
@@ -69,7 +69,7 @@ public class ResourceBeanDefinitionParser extends AbstractRouteListParser {
 
 		for (String action : memberBuilder.defaultResourceMemberActions) {
 			appliedParameters = Collections.singletonMap(collectionBuilder.getActionParamterName(), action);
-			routes.add(RouteParserUtils.createAppliedRoute(element, parserContext, memberActionPattern, memberBuilder, appliedParameters));
+			routes.add(memberBuilder.createAppliedRoute(memberActionPattern, appliedParameters));
 		}
 
 		if (memberActions != null) {
@@ -87,7 +87,7 @@ public class ResourceBeanDefinitionParser extends AbstractRouteListParser {
 				RouteBuilder applyParameters = new RouteBuilder();
 				RouteBuilder appliedParameters = RouteParserUtils.parseRouteParameters(child, applyParameters);
 
-				result.add(RouteParserUtils.createAppliedRoute(element, parserContext, pattern, baseParameters, appliedParameters.parameterValues));
+				result.add(baseParameters.createAppliedRoute(pattern, appliedParameters.parameterValues));
 			}
 		}
 

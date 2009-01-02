@@ -25,10 +25,6 @@ public abstract class AbstractRouteListParser extends AbstractSingleBeanDefiniti
 		List<Route> routes = new ArrayList<Route>();
 		RouteBuilder routeBuilder = new RouteBuilder();
 		parseRouteList(new ParserContext(parserContext.getReaderContext(), parserContext.getDelegate(), builder.getRawBeanDefinition()), element, routes, routeBuilder);
-		applyRouteList(parserContext, element, routes, builder);
-	}
-	
-	protected void applyRouteList(ParserContext parserContext, Element element, List<Route> routes, BeanDefinitionBuilder builder) {
 		builder.addPropertyValue("routes", routes);
 	}
 	

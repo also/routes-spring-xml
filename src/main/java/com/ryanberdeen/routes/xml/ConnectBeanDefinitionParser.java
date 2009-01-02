@@ -11,7 +11,7 @@ public class ConnectBeanDefinitionParser extends AbstractRouteListParser {
 	public Route parse(Element element, ParserContext parserContext, RouteBuilder routeBuilder) {
 		routeBuilder = RouteParserUtils.parseRouteParameters(element, routeBuilder);
 
-		return RouteParserUtils.createRoute(element, parserContext, routeBuilder);
+		return routeBuilder.createRoute();
 	}
 
 }
