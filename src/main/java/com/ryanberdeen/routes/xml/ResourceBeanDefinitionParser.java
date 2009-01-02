@@ -2,22 +2,21 @@ package com.ryanberdeen.routes.xml;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.beans.factory.support.ManagedList;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
+import com.ryanberdeen.routes.Route;
 import com.ryanberdeen.routes.UrlPattern;
 import com.ryanberdeen.routes.builder.RouteBuilder;
 
 public class ResourceBeanDefinitionParser extends AbstractRouteListParser {
 
-	@SuppressWarnings("unchecked")
-	public void parseRouteList(ParserContext parserContext, Element element, ManagedList list, RouteBuilder routeBuilder) {
+	public void parseRouteList(ParserContext parserContext, Element element, List<Route> routes, RouteBuilder routeBuilder) {
 		routeBuilder = RouteParserUtils.parseRouteParameters(element, routeBuilder);
 
 		NodeList children = element.getChildNodes();
@@ -27,8 +26,8 @@ public class ResourceBeanDefinitionParser extends AbstractRouteListParser {
 		UrlPattern collectionActionPattern = null;
 		UrlPattern memberActionPattern = null;
 
-		ArrayList<BeanDefinition> collectionActions = null;
-		ArrayList<BeanDefinition> memberActions = null;
+		ArrayList<Route> collectionActions = null;
+		ArrayList<Route> memberActions = null;
 
 		for (int i = 0; i < children.getLength(); i++) {
 			Node node = children.item(i);
@@ -55,11 +54,11 @@ public class ResourceBeanDefinitionParser extends AbstractRouteListParser {
 		RouteBuilder collectionBuilder = routeBuilder.createCollectionBuilder();
 		for (String action : collectionBuilder.defaultResourceCollectionActions) {
 			appliedParameters = Collections.singletonMap(collectionBuilder.getActionParamterName(), action);
-			list.add(RouteParserUtils.createAppliedRouteBeanDefinition(element, parserContext, collectionActionPattern, routeBuilder, appliedParameters));
+			routes.add(RouteParserUtils.createAppliedRoute(element, parserContext, collectionActionPattern, routeBuilder, appliedParameters));
 		}
 
 		if (collectionActions != null) {
-			list.addAll(collectionActions);
+			routes.addAll(collectionActions);
 		}
 
 		if (memberActionPattern == null) {
@@ -70,16 +69,16 @@ public class ResourceBeanDefinitionParser extends AbstractRouteListParser {
 
 		for (String action : memberBuilder.defaultResourceMemberActions) {
 			appliedParameters = Collections.singletonMap(collectionBuilder.getActionParamterName(), action);
-			list.add(RouteParserUtils.createAppliedRouteBeanDefinition(element, parserContext, memberActionPattern, memberBuilder, appliedParameters));
+			routes.add(RouteParserUtils.createAppliedRoute(element, parserContext, memberActionPattern, memberBuilder, appliedParameters));
 		}
 
 		if (memberActions != null) {
-			list.addAll(memberActions);
+			routes.addAll(memberActions);
 		}
 	}
 
-	private static ArrayList<BeanDefinition> parseApplyTags(ParserContext parserContext, Element element, UrlPattern pattern, RouteBuilder baseParameters) {
-		ArrayList<BeanDefinition> result = new ArrayList<BeanDefinition>();
+	private static ArrayList<Route> parseApplyTags(ParserContext parserContext, Element element, UrlPattern pattern, RouteBuilder baseParameters) {
+		ArrayList<Route> result = new ArrayList<Route>();
 		NodeList children = element.getChildNodes();
 		for (int i = 0; i < children.getLength(); i++) {
 			Node node = children.item(i);
@@ -88,7 +87,7 @@ public class ResourceBeanDefinitionParser extends AbstractRouteListParser {
 				RouteBuilder applyParameters = new RouteBuilder();
 				RouteBuilder appliedParameters = RouteParserUtils.parseRouteParameters(child, applyParameters);
 
-				result.add(RouteParserUtils.createAppliedRouteBeanDefinition(element, parserContext, pattern, baseParameters, appliedParameters.parameterValues));
+				result.add(RouteParserUtils.createAppliedRoute(element, parserContext, pattern, baseParameters, appliedParameters.parameterValues));
 			}
 		}
 

@@ -6,9 +6,6 @@ public class RoutesNamespaceHandler extends NamespaceHandlerSupport {
 
 	public void init() {
 		registerBeanDefinitionParser("routes", new RoutesBeanDefinitionParser());
-		registerBeanDefinitionParser("with", new WithBeanDefinitionParser());
-		registerBeanDefinitionParser("connect", new ConnectBeanDefinitionParser());
-		registerBeanDefinitionParser("resource", new ResourceBeanDefinitionParser());
 	}
 
 }

@@ -3,8 +3,6 @@ package com.ryanberdeen.routes.xml;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.springframework.beans.factory.config.BeanDefinition;
-import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
@@ -16,10 +14,6 @@ import com.ryanberdeen.routes.UrlPattern;
 import com.ryanberdeen.routes.builder.RouteBuilder;
 
 public class RouteParserUtils {
-
-	private static final String URL_PATTERN = "urlPattern";
-	private static final String EXCLUDED_METHODS = "excludedMethods";
-	private static final String METHODS = "methods";
 	private static final String PATTERN = "pattern";
 	private static final String DEFAULT = "default";
 	private static final String NAME = "name";
@@ -28,52 +22,41 @@ public class RouteParserUtils {
 
 	/** Parses the element, using only parameters from the parameterValues argument.
 	 */
-	public static BeanDefinition createRouteBeanDefinition(Element element, ParserContext parserContext, RouteBuilder routeBuilder) {
-		BeanDefinitionBuilder builder = BeanDefinitionBuilder.genericBeanDefinition(Route.class);
-		builder.getRawBeanDefinition().setSource(parserContext.extractSource(element));
-
-		builder.addConstructorArgValue(routeBuilder.getPattern());
-		builder.addConstructorArgValue(routeBuilder.parameterValues);
-		builder.addConstructorArgValue(routeBuilder.parameterRegexes);
-		addPropertyValues(builder, routeBuilder);
-
-		return builder.getBeanDefinition();
+	public static Route createRoute(Element element, ParserContext parserContext, RouteBuilder routeBuilder) {
+		Route route = new Route(routeBuilder.getPattern(), routeBuilder.parameterValues, routeBuilder.parameterRegexes);
+		addPropertyValues(route, routeBuilder);
+		return route;
 	}
 
-	public static BeanDefinition createAppliedRouteBeanDefinition(Element element, ParserContext parserContext, UrlPattern pattern, RouteBuilder routeBuilder, Map<String, String> applyParameters) {
-		BeanDefinitionBuilder builder = BeanDefinitionBuilder.genericBeanDefinition(Route.class);
-
-		builder.getRawBeanDefinition().setSource(parserContext.extractSource(element));
-
+	public static Route createAppliedRoute(Element element, ParserContext parserContext, UrlPattern pattern, RouteBuilder routeBuilder, Map<String, String> applyParameters) {
 		HashMap<String, String> routeParameters = (HashMap<String, String>) routeBuilder.parameterValues.clone();
 		routeParameters.putAll(applyParameters);
 
 		UrlPattern appliedPattern = pattern.apply(applyParameters, routeBuilder.parameterValues);
+		Route route = new Route();
+		route.setUrlPattern(appliedPattern);
+		route.setStaticParameters(routeParameters);
+		addPropertyValues(route, routeBuilder);
 
-		builder.addPropertyValue(URL_PATTERN, appliedPattern);
-		builder.addPropertyValue("staticParameters", routeParameters);
-		addPropertyValues(builder, routeBuilder);
-
-		return builder.getBeanDefinition();
+		return route;
 	}
 
-	public static BeanDefinition createRouteBeanDefinition(Element element, ParserContext parserContext, UrlPattern pattern, RouteBuilder routeBuilder) {
-		BeanDefinitionBuilder builder = BeanDefinitionBuilder.genericBeanDefinition(Route.class);
+	public static Route createRouteBeanDefinition(Element element, ParserContext parserContext, UrlPattern pattern, RouteBuilder routeBuilder) {
+		Route route = new Route();
 
-		builder.getRawBeanDefinition().setSource(parserContext.extractSource(element));
+		route.setUrlPattern(pattern);
+		route.setStaticParameters(routeBuilder.parameterValues);
 
-		builder.addPropertyValue(URL_PATTERN, pattern);
-		builder.addPropertyValue("staticParameters", routeBuilder.parameterValues);
-		addPropertyValues(builder, routeBuilder);
+		addPropertyValues(route, routeBuilder);
 
-		return builder.getBeanDefinition();
+		return route;
 	}
 
-	private static void addPropertyValues(BeanDefinitionBuilder builder, RouteBuilder routeBuilder) {
-		builder.addPropertyValue("defaultStaticParameters", routeBuilder.defaultStaticParameterValues);
-		builder.addPropertyValue(NAME, routeBuilder.getName());
-		builder.addPropertyValue(METHODS, routeBuilder.getMethods());
-		builder.addPropertyValue(EXCLUDED_METHODS, routeBuilder.getExcludedMethods());
+	private static void addPropertyValues(Route route, RouteBuilder routeBuilder) {
+		route.setDefaultStaticParameters(routeBuilder.defaultStaticParameterValues);
+		route.setName(routeBuilder.getName());
+		route.setMethods(routeBuilder.getMethods());
+		route.setExcludedMethods(routeBuilder.getExcludedMethods());
 	}
 
 	public static RouteBuilder parseRouteParameters(Element element, RouteBuilder routeBuilder) {
@@ -88,7 +71,7 @@ public class RouteParserUtils {
 				result.setOption(parameterName, value);
 			}
 			else {
-				result.parameterValues.put(parameterName, value);
+				result.setParameterValue(parameterName, value);
 			}
 		}
 
@@ -113,7 +96,7 @@ public class RouteParserUtils {
 		String name = parameterTag.getAttribute(NAME);
 		if (parameterTag.hasAttribute(VALUE)) {
 			String value = parameterTag.getAttribute(VALUE);
-			routeBuilder.parameterValues.put(name, value);
+			routeBuilder.setParameterValue(name, value);
 			if (parameterTag.hasAttribute(DEFAULT)) {
 				boolean defaultStaticParameter = Boolean.valueOf(parameterTag.getAttribute(DEFAULT));
 				if (defaultStaticParameter) {
