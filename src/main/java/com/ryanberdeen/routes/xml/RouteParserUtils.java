@@ -5,7 +5,7 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import com.ryanberdeen.routes.builder.RouteBuilder;
+import com.ryanberdeen.routes.builder.RouteOptions;
 
 public class RouteParserUtils {
 	private static final String PATTERN = "pattern";
@@ -14,53 +14,49 @@ public class RouteParserUtils {
 	private static final String VALUE = "value";
 	private static final String PARAMETER = "parameter";
 
-	public static RouteBuilder parseRouteParameters(Element element, RouteBuilder routeBuilder) {
-		RouteBuilder result = new RouteBuilder(routeBuilder);
-
+	public static void parseRouteParameters(Element element, RouteOptions routeOptions) {
 		NamedNodeMap attributes = element.getAttributes();
 		for (int i = 0; i < attributes.getLength(); ++i) {
 			Node node = attributes.item(i);
 			String value = node.getTextContent();
 			String parameterName = node.getLocalName();
 			if (node.getNamespaceURI() != null) {
-				result.setOption(parameterName, value);
+				routeOptions.setOption(parameterName, value);
 			}
 			else {
-				result.setParameterValue(parameterName, value);
+				routeOptions.setParameterValue(parameterName, value);
 			}
 		}
 
-		parseRouteParameterTags(element, result);
-
-		return result;
+		parseRouteParameterTags(element, routeOptions);
 	}
 
-	public static void parseRouteParameterTags(Element element, RouteBuilder routeBuilder) {
+	public static void parseRouteParameterTags(Element element, RouteOptions routeOptions) {
 		NodeList children = element.getElementsByTagName(PARAMETER);
 
 		for (int i = 0; i < children.getLength(); i++) {
 			Node node = children.item(i);
 			if (node instanceof Element) {
 				Element child =  (Element) node;
-				parseParameterTag(child, routeBuilder);
+				parseParameterTag(child, routeOptions);
 			}
 		}
 	}
 
-	private static void parseParameterTag(Element parameterTag, RouteBuilder routeBuilder) {
+	private static void parseParameterTag(Element parameterTag, RouteOptions routeOptions) {
 		String name = parameterTag.getAttribute(NAME);
 		if (parameterTag.hasAttribute(VALUE)) {
 			String value = parameterTag.getAttribute(VALUE);
-			routeBuilder.setParameterValue(name, value);
+			routeOptions.setParameterValue(name, value);
 			if (parameterTag.hasAttribute(DEFAULT)) {
 				boolean defaultStaticParameter = Boolean.valueOf(parameterTag.getAttribute(DEFAULT));
 				if (defaultStaticParameter) {
-					routeBuilder.setDefaultStaticParameterValue(name, value);
+					routeOptions.setDefaultStaticParameterValue(name, value);
 				}
 			}
 		}
 		if (parameterTag.hasAttribute(PATTERN)) {
-			routeBuilder.setParameterRegex(name, parameterTag.getAttribute(PATTERN));
+			routeOptions.setParameterRegex(name, parameterTag.getAttribute(PATTERN));
 		}
 	}
 }

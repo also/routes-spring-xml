@@ -4,9 +4,8 @@ import org.springframework.beans.factory.xml.BeanDefinitionParser;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
-import com.ryanberdeen.routes.builder.RouteBuilder;
 import com.ryanberdeen.routes.builder.RouteSetBuilder;
 
 public interface RouteListParser extends BeanDefinitionParser {
-	public void parseRouteList(ParserContext parserContext, Element element, RouteSetBuilder routeSetBuilder, RouteBuilder routeBuilder);
+	public void parseRouteList(ParserContext parserContext, Element element, RouteSetBuilder routeSetBuilder);
 }

@@ -5,7 +5,6 @@ import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.w3c.dom.Element;
 
-import com.ryanberdeen.routes.builder.RouteBuilder;
 import com.ryanberdeen.routes.builder.RouteSetBuilder;
 
 public class RoutesBeanDefinitionParser extends AbstractRouteListParser {
@@ -20,8 +19,8 @@ public class RoutesBeanDefinitionParser extends AbstractRouteListParser {
 	}
 
 	@Override
-	public void parseRouteList(ParserContext parserContext, Element element, RouteSetBuilder routeSetBuilder, RouteBuilder routeBuilder) {
-		RouteParserUtils.parseRouteParameterTags(element, routeBuilder);
-		super.parseRouteList(parserContext, element, routeSetBuilder, routeBuilder);
+	public void parseRouteList(ParserContext parserContext, Element element, RouteSetBuilder routeSetBuilder) {
+		RouteParserUtils.parseRouteParameterTags(element, routeSetBuilder);
+		super.parseRouteList(parserContext, element, routeSetBuilder);
 	}
 }
