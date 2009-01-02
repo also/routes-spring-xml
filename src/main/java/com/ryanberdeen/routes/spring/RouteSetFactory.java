@@ -1,23 +1,19 @@
 package com.ryanberdeen.routes.spring;
 
-import java.util.List;
-
 import org.springframework.beans.factory.FactoryBean;
 
-import com.ryanberdeen.routes.Route;
 import com.ryanberdeen.routes.RouteSet;
+import com.ryanberdeen.routes.builder.RouteSetBuilder;
 
 public class RouteSetFactory implements FactoryBean {
-	private List<Route> routes;
+	private RouteSetBuilder routeSetBuilder;
 	
-	public void setRoutes(List<Route> routes) {
-		this.routes = routes;
+	public void setRouteSetBuilder(RouteSetBuilder routeSetBuilder) {
+		this.routeSetBuilder = routeSetBuilder;
 	}
 	
 	public Object getObject() throws Exception {
-		RouteSet routeSet = new RouteSet();
-		routeSet.setRoutes(routes);
-		return routeSet;
+		return routeSetBuilder.createRouteSet();
 	}
 
 	public Class<RouteSet> getObjectType() {

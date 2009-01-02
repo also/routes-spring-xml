@@ -13,10 +13,10 @@ import org.w3c.dom.NodeList;
 import com.ryanberdeen.routes.Route;
 import com.ryanberdeen.routes.UrlPattern;
 import com.ryanberdeen.routes.builder.RouteBuilder;
+import com.ryanberdeen.routes.builder.RouteSetBuilder;
 
 public class ResourceBeanDefinitionParser extends AbstractRouteListParser {
-
-	public void parseRouteList(ParserContext parserContext, Element element, List<Route> routes, RouteBuilder routeBuilder) {
+	public void parseRouteList(ParserContext parserContext, Element element, RouteSetBuilder routeSetBuilder, RouteBuilder routeBuilder) {
 		routeBuilder = RouteParserUtils.parseRouteParameters(element, routeBuilder);
 
 		NodeList children = element.getChildNodes();
@@ -54,11 +54,13 @@ public class ResourceBeanDefinitionParser extends AbstractRouteListParser {
 		RouteBuilder collectionBuilder = routeBuilder.createCollectionBuilder();
 		for (String action : collectionBuilder.defaultResourceCollectionActions) {
 			appliedParameters = Collections.singletonMap(collectionBuilder.getActionParamterName(), action);
-			routes.add(routeBuilder.createAppliedRoute(collectionActionPattern, appliedParameters));
+			routeSetBuilder.add(routeBuilder.createAppliedRoute(collectionActionPattern, appliedParameters));
 		}
 
 		if (collectionActions != null) {
-			routes.addAll(collectionActions);
+			for (Route route : collectionActions) {
+				routeSetBuilder.add(route);
+			}
 		}
 
 		if (memberActionPattern == null) {
@@ -69,11 +71,13 @@ public class ResourceBeanDefinitionParser extends AbstractRouteListParser {
 
 		for (String action : memberBuilder.defaultResourceMemberActions) {
 			appliedParameters = Collections.singletonMap(collectionBuilder.getActionParamterName(), action);
-			routes.add(memberBuilder.createAppliedRoute(memberActionPattern, appliedParameters));
+			routeSetBuilder.add(memberBuilder.createAppliedRoute(memberActionPattern, appliedParameters));
 		}
 
 		if (memberActions != null) {
-			routes.addAll(memberActions);
+			for (Route route : memberActions) {
+				routeSetBuilder.add(route);
+			}
 		}
 	}
 
