@@ -17,8 +17,7 @@ public class ResourceBeanDefinitionParser extends AbstractRouteListParser {
 
 		NodeList children = element.getChildNodes();
 
-		RouteBuilder routeBuilder = routeSetBuilder.getRouteDefinition();
-		UrlPattern prefix = routeBuilder.createUrlPattern();
+		UrlPattern prefix = routeSetBuilder.createUrlPattern();
 
 		RouteSetBuilder collectionRouteSetBuilder = routeSetBuilder.template("collection");
 		UrlPattern collectionActionPattern = prefix.append(collectionRouteSetBuilder.getOption(ResourceTemplate.COLLECTION_PATTERN_OPTION));
