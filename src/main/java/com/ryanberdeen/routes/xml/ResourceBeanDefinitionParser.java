@@ -5,8 +5,6 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import com.ryanberdeen.routes.builder.PathPatternBuilder;
-import com.ryanberdeen.routes.builder.ResourceTemplate;
 import com.ryanberdeen.routes.builder.RouteBuilder;
 import com.ryanberdeen.routes.builder.RouteSetBuilder;
 
@@ -17,12 +15,8 @@ public class ResourceBeanDefinitionParser extends AbstractRouteListParser {
 
 		NodeList children = element.getChildNodes();
 
-		PathPatternBuilder prefix = routeSetBuilder.createPathPatternBuilder();
-
 		RouteSetBuilder collectionRouteSetBuilder = routeSetBuilder.template("collection");
-		PathPatternBuilder collectionActionPattern = prefix.append(collectionRouteSetBuilder.getOption(ResourceTemplate.COLLECTION_PATTERN_OPTION));
 		RouteSetBuilder memberRouteSetBuilder = routeSetBuilder.template("member");
-		PathPatternBuilder memberActionPattern = prefix.append(memberRouteSetBuilder.getOption(ResourceTemplate.MEMBER_PATTERN_OPTION));
 
 		for (int i = 0; i < children.getLength(); i++) {
 			Node node = children.item(i);
@@ -30,25 +24,26 @@ public class ResourceBeanDefinitionParser extends AbstractRouteListParser {
 				Element child =  (Element) node;
 
 				if (child.getTagName().equals("collection")) {
-					parseApplyTags(parserContext, child, collectionActionPattern, collectionRouteSetBuilder);
+					parseApplyTags(parserContext, child, collectionRouteSetBuilder);
 				}
 				else if (child.getTagName().equals("member")) {
-					parseApplyTags(parserContext, child, memberActionPattern, memberRouteSetBuilder);
+					parseApplyTags(parserContext, child, memberRouteSetBuilder);
 				}
 			}
 		}
 	}
 
-	private static void parseApplyTags(ParserContext parserContext, Element element, PathPatternBuilder pattern, RouteSetBuilder routeSetBuilder) {
+	private static void parseApplyTags(ParserContext parserContext, Element element, RouteSetBuilder routeSetBuilder) {
 		NodeList children = element.getChildNodes();
 		for (int i = 0; i < children.getLength(); i++) {
 			Node node = children.item(i);
 			if (node instanceof Element) {
+				// TODO don't use route builder
 				Element child =  (Element) node;
 				RouteBuilder appliedParameters = new RouteBuilder();
 				RouteParserUtils.parseRouteParameters(child, appliedParameters);
 
-				routeSetBuilder.apply(pattern, appliedParameters.parameterValues);
+				routeSetBuilder.apply(appliedParameters.parameterValues);
 			}
 		}
 	}
