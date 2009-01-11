@@ -43,7 +43,7 @@ public class ResourceBeanDefinitionParser extends AbstractRouteListParser {
 				RouteBuilder appliedParameters = new RouteBuilder();
 				RouteParserUtils.parseRouteParameters(child, appliedParameters);
 
-				routeSetBuilder.apply(appliedParameters.parameterValues);
+				routeSetBuilder.apply(appliedParameters);
 			}
 		}
 	}
